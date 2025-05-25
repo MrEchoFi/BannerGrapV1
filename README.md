@@ -41,4 +41,6 @@ https://github.com/user-attachments/assets/d6e3640e-f159-423f-b55a-664d725ab70d
     go run bannerGrap.go
     
     // now follow the guidline- 'bannerGrap_Guid or Usage.txt'  for better bash scripting .. 
+# Note:
+Use valid, origin, dynamic ip or domain information for better output to finding hidden infor or directories and pro investigation & analysis. BTW use this tool in authorization or lab environment with permission and work as ethnically. If any illegal activity u persist then Mr.EchoFi will not responsible for this.  
 Happy HackNight!!!!

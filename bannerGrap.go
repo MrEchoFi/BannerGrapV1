@@ -37,7 +37,7 @@ SOFTWARE.
 
 
 package main
-
+// Dependencies.....
 import (
 	"bufio"
 	"crypto/tls"
@@ -52,17 +52,17 @@ import (
 	"time"
 )
 
-// Protocols and their default payloads
+
 var protocolPayloads = map[string]string{
 	"http":  "GET / HTTP/1.1\r\nHost: %s\r\n\r\n",
 	"https": "GET / HTTP/1.1\r\nHost: %s\r\n\r\n",
 	"smtp":  "EHLO %s\r\n",
 	"ftp":   "USER anonymous\r\n",
-	"ssh":   "", // SSH typically sends banner first
+	"ssh":   "", 
 	"telnet": "",
 }
 
-// Result struct for output
+
 type BannerResult struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
@@ -71,13 +71,13 @@ type BannerResult struct {
 	Error    string `json:"error,omitempty"`
 }
 
-// grabBanner connects to the host:port and retrieves the banner (optionally using TLS)
+
 func grabBanner(host, port, protocol, payload string, timeout time.Duration, useTLS bool) BannerResult {
 	address := net.JoinHostPort(host, port)
 	var conn net.Conn
 	var err error
 
-	// Connect (plain or TLS)
+	
 	if useTLS {
 		conn, err = tls.DialWithDialer(&net.Dialer{Timeout: timeout}, "tcp", address, &tls.Config{
 			InsecureSkipVerify: true,
@@ -92,19 +92,19 @@ func grabBanner(host, port, protocol, payload string, timeout time.Duration, use
 	defer conn.Close()
 	conn.SetDeadline(time.Now().Add(timeout))
 
-	// Send payload if provided
+
 	if payload != "" {
 		fmt.Fprintf(conn, payload, host)
 	}
 
-	// Read banner into a builder
+	
 	var banner strings.Builder
 	buf := make([]byte, 4096)
 	for {
 		n, err := conn.Read(buf)
 		if n > 0 {
 			banner.Write(buf[:n])
-			// break on HTTP double newline
+			
 			if strings.Contains(banner.String(), "\r\n\r\n") {
 				break
 			}
@@ -116,7 +116,7 @@ func grabBanner(host, port, protocol, payload string, timeout time.Duration, use
 	return BannerResult{Host: host, Port: port, Protocol: protocol, Banner: banner.String()}
 }
 
-// parseTarget splits "host[:port]" into host and port (empty if none)
+
 func parseTarget(target string) (host, port string) {
 	parts := strings.Split(target, ":")
 	switch len(parts) {
@@ -142,7 +142,7 @@ __________                                      ________
     `
     fmt.Println(asciiArt)
 
-	// CLI flags
+	
 	targetsFile := flag.String("f", "", "File with list of targets (host:port per line)")
 	protocol := flag.String("proto", "http", "Protocol: http, https, ftp, smtp, ssh, telnet, custom")
 	portFlag := flag.String("port", "", "Port (overrides port in targets file/CLI)")
@@ -152,7 +152,7 @@ __________                                      ________
 	output := flag.String("o", "", "Output file (CSV or JSON, inferred by extension)")
 	flag.Parse()
 
-	// Build list of targets
+	
 	var targets []string
 	if *targetsFile != "" {
 		file, err := os.Open(*targetsFile)
@@ -180,15 +180,15 @@ __________                                      ________
 		fmt.Println("----------- Banner grabbing tool BY: MrEchoFi -----------")
 		fmt.Println("---------------- Copyright 2025 MrEchoFi ----------------")
 		fmt.Println("***********************************************************")
-		fmt.Println("Usage: All Usages is on Guid_or_Usage.txt file.  |Flags:  bannerGrap [options] target1[:port] target2[:port]...")
+		fmt.Println("Usage: All Usages is on Guid_or_Usage.txt file.  |Flags: -f, -proto, -port, -payload, -timeout, -threads, -o|")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	// Protocol & payload setup
+	
 	proto := strings.ToLower(*protocol)
 	useTLS := proto == "https"
-	// Determine payload
+	
 	protoPayload := protocolPayloads[proto]
 	if *payload != "" {
 		protoPayload = *payload
@@ -197,12 +197,12 @@ __________                                      ________
 	overridePort := *portFlag
 	timeoutDur := time.Duration(*timeout) * time.Second
 
-	// Prepare concurrency
+	
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, *concurrency)
 	results := make([]BannerResult, len(targets))
 
-	// Scan each target
+	
 	for i, tgt := range targets {
 		wg.Add(1)
 		go func(idx int, target string) {
@@ -211,7 +211,7 @@ __________                                      ________
 			defer func() { <-sem }()
 
 			host, portStr := parseTarget(target)
-			// Apply override or default
+			
 			if overridePort != "" {
 				portStr = overridePort
 			} else if portStr == "" {
@@ -227,7 +227,7 @@ __________                                      ________
 	}
 	wg.Wait()
 
-	// Output results
+	
 	switch {
 	case *output != "":
 		if strings.HasSuffix(*output, ".json") {

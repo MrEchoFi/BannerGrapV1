@@ -1,5 +1,3 @@
-/*
-
 
 Flags:
   -f string
@@ -18,6 +16,15 @@ Flags:
         Output file path (.json or .csv, txt  inferred by extension; console if empty)
 
    -h    help
+
+Note :""" You can also use this tool like this, 
+       go build -o ban bannerGrap.go
+	   
+	   then run this-> ./ban        
+	    also -> ./ban  -proto https http example.com:80 443 8080 
+
+		         etc......Mix, match, and tweak these to your heart’s content[For Master the tool you can see the all usage under below as Step-1, Step-2, Step-3 & Step-3 extreme]. Whether you’re storming data centers or scanning local labs...
+	   """
 
    ### USAGE:
 	 ## step 1_Usage:
@@ -578,4 +585,4 @@ go run bannerGrap.go \
   ///////Mix, match, and tweak these to your heart’s content. Whether you’re storming data centers or scanning local labs,
   //  bannerGrap.go is armed for maximum throughput, deep fingerprinting, and streamlined output in JSON or CSV.
 
-*/
+_____________________END____________>>>>>
